@@ -8,7 +8,7 @@
     <groupId>catmoe.fallencrystal.protocolwarn</groupId>
     <artifactId>ProtocolWarn</artifactId>
         <properties>
-        <java.version>1.8</java.version>
+        <java.version>1.11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.8.21</kotlin.version>
         <project.version>0.0.1</project.version>
