@@ -7,6 +7,7 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import dev.simplix.protocolize.data.Sound
 import java.io.File
+import java.lang.IllegalArgumentException
 
 object ObjectConfig {
     private val folder = ObjectPlugin.getDataFolder()
@@ -26,18 +27,19 @@ object ObjectConfig {
                         server-name="example"
                         protocol=[47]
                         warn=true
-                        custom-message=[
-                            "",
-                            "Here is custom warn message. support [ServerVersion] and [ClientVersion] placeholder",
-                            ""
-                        ]
+                        message="default"
                     }
                     {
                         server-name="example2"
                         protocol=[762, 761]
                         # 是否向玩家发送警告消息. 如果为true则发送
                         warn=false
-                        # 如空将会使用global-message
+                        message="default"
+                    }
+                    {
+                        server-name="PT"
+                        protocol=[47]
+                        warn=true
                         message="default"
                     }
                 ]
@@ -62,7 +64,7 @@ object ObjectConfig {
                             stay=0
                             fadeOut=0
                         }
-                        sound=BLOCK_ENDER_CHEST_OPEN
+                        sound="BLOCK_ENDER_CHEST_OPEN"
                         # 发送延迟. 以毫秒为单位. 避免玩家在加载世界时就发送消息.
                         delay=3000
                     }
@@ -136,8 +138,8 @@ object ObjectConfig {
             val titleFadeIn = messageConfig.getInt("title.fadeIn")
             val titleStay = messageConfig.getInt("title.stay")
             val titleFadeOut = messageConfig.getInt("title.fadeOut")
-            val anySound = messageConfig.getAnyRef("sound")
-            val sound = (try { anySound as Sound } catch (ex: Exception) { MessageUtil.logWarn("[ProtocolWarn] $anySound 不是一个有效的声音类型. 如果您不想启用声音 可以安全忽略此消息"); null } )
+            val soundName = messageConfig.getString("sound")
+            val sound = try { if (soundName != null) { Sound.valueOf(soundName) } else null } catch (ex: IllegalArgumentException) { MessageUtil.logWarn("[ProtocolWarn] $soundName 不是一个有效的声音类型. 如果您不想启用声音，可以安全忽略此消息"); null }
             val delay = messageConfig.getInt("delay")
             Message(name, message, actionbar, title, subtitle, titleFadeIn, titleStay, titleFadeOut, sound, delay)
         }
