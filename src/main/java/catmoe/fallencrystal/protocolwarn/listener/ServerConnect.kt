@@ -17,7 +17,7 @@ class ServerConnect : EventListener {
     fun onServerConnected(event: AsyncServerConnectEvent) {
         val server = ObjectConfig.getServer(event.server.name)
         val clientVersion = event.player.pendingConnection.version
-        if (event.isConnected && server != null) {
+        if (event.isConnected && server != null && event.player.hasPermission("protocolwarn.ignore.server.${event.server.name}")) {
             if (server.message == null) { MessageUtil.logWarn("[ProtocolWarn] 未找到指定消息. 检查您的配置文件."); return }
             var warn = server.warn
             server.protocol.forEach { if (clientVersion == it) { warn = false } }
@@ -26,6 +26,7 @@ class ServerConnect : EventListener {
     }
 
     private fun sendMessage(message: Message, player: ProxiedPlayer, s: Int, c: Int) {
+        if (player.hasPermission("protocolwarn.ignore.message.${message.name}")) { return }
         if (message.title.isNotEmpty() || message.subtitle.isNotEmpty() && message.titleStay != 0) {
             MessageUtil.sendTitle(player, rm(s,c,message.title), rm(s,c,message.subtitle), message.titleFadeIn, message.titleStay, message.titleFadeOut)
         }
