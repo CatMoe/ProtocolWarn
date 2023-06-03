@@ -1,9 +1,11 @@
 package catmoe.fallencrystal.protocolwarn.config
 
+import catmoe.fallencrystal.moefilter.util.message.MessageUtil
 import catmoe.fallencrystal.protocolwarn.ObjectPlugin
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
+import dev.simplix.protocolize.data.Sound
 import java.io.File
 
 object ObjectConfig {
@@ -14,13 +16,11 @@ object ObjectConfig {
     // Name, Server
     private val serverCache = Caffeine.newBuilder().build<String, WarnServer>()
 
+    private val messageCache = Caffeine.newBuilder().build<String, Message>()
+
     private var config: Config? = null
 
     private val defaultConfig = """
-                global-message=[
-                    "&c您当前所游玩的服务器的主要版本 [ServerVersion] 跟您的客户端版本 [ClientVersion] 不一致.",
-                    "因此导致的不符合预期的行为后果自负"
-                ]
                 servers=[
                     {
                         server-name="example"
@@ -38,7 +38,31 @@ object ObjectConfig {
                         # 是否向玩家发送警告消息. 如果为true则发送
                         warn=false
                         # 如空将会使用global-message
-                        custom-message=[]
+                        message="default"
+                    }
+                ]
+                messages=[
+                    {
+                        name="default"
+                        message=[
+                            "",
+                            " &e您当前所游玩的服务器的版本 [ServerVersion]",
+                            " &e与您的客户端版本 [ClientVersion] 不一致",
+                            " &e您的游戏体验可能会受到些许影响 仍然建议切换到与服务器相同的版本.",
+                            ""
+                        ]
+                        # 空则不发送消息.
+                        actionbar=""
+                        # title如果title或subtitle有一个不为空则发送title. stay必须不为0
+                        title {
+                            title=""
+                            subtitle=""
+                            # 以tick为单位.
+                            fadeIn=0
+                            stay=0
+                            fadeOut=0
+                        }
+                        sound=BLOCK_ENDER_CHEST_OPEN
                     }
                 ]
                 protocol {
@@ -83,22 +107,43 @@ object ObjectConfig {
         if (!folder.exists()) { folder.mkdirs() }
         if (!configFile.exists()) { configFile.createNewFile(); configFile.writeText(defaultConfig) }
         config = ConfigFactory.parseFile(configFile)
+        loadMessage()
+        MessageUtil.logInfo("[ProtocolWarn] 已加载消息列表")
         loadServerList()
+        MessageUtil.logInfo("[ProtocolWarn] 已加载服务器列表")
     }
 
     private fun loadServerList() {
         val serverList = config!!.getConfigList("servers").map { serverConfig ->
             val name = serverConfig.getString("server-name")
-            val protocol = serverConfig.getIntList("protocol")
+            val protocol = serverConfig.getIntList("protocol") ?: listOf(0)
             val warn = serverConfig.getBoolean("warn")
-            val customMessage = serverConfig.getStringList("custom-message")
-            val warnMessage = if (customMessage.isEmpty()) config!!.getStringList("global-message") else customMessage
+            val warnMessage = messageCache.getIfPresent(serverConfig.getString("message"))
             WarnServer(name, protocol, warn, warnMessage)
         }
         serverList.forEach { serverCache.put(it.name, it) }
     }
 
+    private fun loadMessage() {
+        val messageList = config!!.getConfigList("messages").map { messageConfig ->
+            val name = messageConfig.getString("name")
+            val message = messageConfig.getStringList("message")
+            val actionbar = messageConfig.getString("actionbar")
+            val title = messageConfig.getString("title.title")
+            val subtitle = messageConfig.getString("title.subtitle")
+            val titleFadeIn = messageConfig.getInt("title.fadeIn")
+            val titleStay = messageConfig.getInt("title.stay")
+            val titleFadeOut = messageConfig.getInt("title.fadeOut")
+            val anySound = messageConfig.getAnyRef("sound")
+            val sound = (try { anySound as Sound } catch (ex: Exception) { MessageUtil.logWarn("[ProtocolWarn] $anySound 不是一个有效的声音类型. 如果您不想启用声音 可以安全忽略此消息"); null } )
+            Message(name, message, actionbar, title, subtitle, titleFadeIn, titleStay, titleFadeOut, sound)
+        }
+        messageList.forEach { messageCache.put(it.name, it) }
+    }
+
     fun getServer(server: String): WarnServer? { return serverCache.getIfPresent(server) }
+
+    fun getMessage(message: String): Message? { return messageCache.getIfPresent(message) }
 
     fun getConfig(): Config { return config!! }
 }

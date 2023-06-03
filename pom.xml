@@ -125,6 +125,14 @@
             <id>bungeecord-repo</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
+        <repository>
+            <id>exceptionflug</id>
+            <url>https://mvn.exceptionflug.de/repository/exceptionflug-public/</url>
+        </repository>
+        <repository>
+            <id>simplixsoft-public</id>
+            <url>https://repo.simplix.dev/repository/simplixsoft-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -146,6 +154,12 @@
             <version>0.0.1-API3</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/MoeFilter.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>dev.simplix</groupId>
+            <artifactId>protocolize-api</artifactId>
+            <scope>provided</scope>
+            <version>2.2.6</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

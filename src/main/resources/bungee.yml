@@ -5,3 +5,4 @@ main: catmoe.fallencrystal.protocolwarn.ProtocolWarn
 description: 'Configurable warns when player join backend server. Using MoeFilter API.'
 depends:
   - MoeFilter
+  - Protocolize
