@@ -63,6 +63,8 @@ object ObjectConfig {
                             fadeOut=0
                         }
                         sound=BLOCK_ENDER_CHEST_OPEN
+                        # 发送延迟. 以毫秒为单位. 避免玩家在加载世界时就发送消息.
+                        delay=3000
                     }
                 ]
                 protocol {
@@ -136,7 +138,8 @@ object ObjectConfig {
             val titleFadeOut = messageConfig.getInt("title.fadeOut")
             val anySound = messageConfig.getAnyRef("sound")
             val sound = (try { anySound as Sound } catch (ex: Exception) { MessageUtil.logWarn("[ProtocolWarn] $anySound 不是一个有效的声音类型. 如果您不想启用声音 可以安全忽略此消息"); null } )
-            Message(name, message, actionbar, title, subtitle, titleFadeIn, titleStay, titleFadeOut, sound)
+            val delay = messageConfig.getInt("delay")
+            Message(name, message, actionbar, title, subtitle, titleFadeIn, titleStay, titleFadeOut, sound, delay)
         }
         messageList.forEach { messageCache.put(it.name, it) }
     }

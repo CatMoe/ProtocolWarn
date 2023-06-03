@@ -11,5 +11,6 @@ class Message(
     val titleFadeIn: Int,
     val titleStay: Int,
     val titleFadeOut: Int,
-    val sound: Sound?
+    val sound: Sound?,
+    val delay: Int,
 )
