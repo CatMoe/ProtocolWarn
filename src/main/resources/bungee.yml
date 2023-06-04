@@ -1,8 +1,0 @@
-name: 'ProtocolWarn'
-version: '0.0.1'
-author: FallenCrystal
-main: catmoe.fallencrystal.protocolwarn.ProtocolWarn
-description: 'Configurable warns when player join backend server. Using MoeFilter API.'
-depends:
-  - MoeFilter
-  - Protocolize

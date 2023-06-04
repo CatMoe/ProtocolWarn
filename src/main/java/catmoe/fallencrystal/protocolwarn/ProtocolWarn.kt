@@ -11,7 +11,7 @@ class ProtocolWarn : Plugin() {
         ObjectPlugin.setPlugin(this)
         ObjectPlugin.setDataFolder(dataFolder)
         ObjectConfig.loadConfig()
-        EventManager.registerListener(ServerConnect())
+        EventManager.registerListener(this, ServerConnect())
     }
 
     override fun onDisable() { EventManager.unregisterListener(ServerConnect()) }
