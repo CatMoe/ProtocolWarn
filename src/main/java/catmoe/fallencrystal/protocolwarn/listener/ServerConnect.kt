@@ -4,6 +4,7 @@ import catmoe.fallencrystal.moefilter.api.event.EventListener
 import catmoe.fallencrystal.moefilter.api.event.FilterEvent
 import catmoe.fallencrystal.moefilter.api.event.events.bungee.AsyncServerConnectEvent
 import catmoe.fallencrystal.moefilter.util.message.MessageUtil
+import catmoe.fallencrystal.moefilter.util.message.MessageUtil.colorizeMiniMessage
 import catmoe.fallencrystal.protocolwarn.Version
 import catmoe.fallencrystal.protocolwarn.config.Message
 import catmoe.fallencrystal.protocolwarn.config.ObjectConfig
@@ -28,11 +29,17 @@ class ServerConnect : EventListener {
     private fun sendMessage(message: Message, player: ProxiedPlayer, s: Int, c: Int) {
         if (player.hasPermission("protocolwarn.ignore.message.${message.name}")) { return }
         if (message.title.isNotEmpty() || message.subtitle.isNotEmpty() && message.titleStay != 0) {
-            MessageUtil.sendTitle(player, rm(s,c,message.title), rm(s,c,message.subtitle), message.titleFadeIn, message.titleStay, message.titleFadeOut)
+            MessageUtil.sendTitle(player, colorizeMiniMessage(rm(s,c,message.title)), colorizeMiniMessage(rm(s,c,message.subtitle)), message.titleFadeIn, message.titleStay, message.titleFadeOut)
         }
         if (message.actionbar.isNotEmpty()) { MessageUtil.sendActionbar(player, rm(s,c,message.actionbar)) }
         if (message.sound != null) { Sound.playSound(player, message.sound) }
-        if (message.message.isNotEmpty()) { message.message.forEach { MessageUtil.sendMessage(player, rm(s,c,it)) } }
+        // message.message.forEach { MessageUtil.sendMessage(player, rm(s,c,it)) } -- Legacy
+        if (message.message.isNotEmpty()) {
+            val input = mutableListOf<String>()
+            message.message.forEach { input.add(rm(s,c,it)) }
+            // <reset> and <newline> are MiniMessage tag.
+            MessageUtil.sendMessage(player, colorizeMiniMessage(input.joinToString("<reset><newline>")))
+        }
     }
 
     private fun rm(s: Int, c: Int, m: String): String { return Version.replaceMessage(m, s, c) }

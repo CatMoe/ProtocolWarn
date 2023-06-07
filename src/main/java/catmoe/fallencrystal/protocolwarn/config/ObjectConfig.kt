@@ -48,9 +48,9 @@ object ObjectConfig {
                         name="default"
                         message=[
                             "",
-                            " &e您当前所游玩的服务器的版本 [ServerVersion]",
-                            " &e与您的客户端版本 [ClientVersion] 不一致",
-                            " &e您的游戏体验可能会受到些许影响 仍然建议切换到与服务器相同的版本.",
+                            " <yellow>您当前所游玩的服务器的版本 [ServerVersion]",
+                            " <yellow>与您的客户端版本 [ClientVersion] 不一致",
+                            " <yellow>您的游戏体验可能会受到些许影响 仍然建议切换到与服务器相同的版本.",
                             ""
                         ]
                         # 空则不发送消息.
