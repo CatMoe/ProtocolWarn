@@ -22,6 +22,7 @@ object ObjectConfig {
     private var config: Config? = null
 
     private val defaultConfig = """
+                # 配置文件可以通过/moefilter reload重新加载
                 servers=[
                     {
                         server-name="example"
@@ -45,7 +46,7 @@ object ObjectConfig {
                 ]
                 messages=[
                     {
-                        name="default"
+                        name=default
                         message=[
                             "",
                             " <yellow>您当前所游玩的服务器的版本 [ServerVersion]",
@@ -109,6 +110,8 @@ object ObjectConfig {
     """.trimIndent()
 
     fun loadConfig() {
+        serverCache.invalidateAll()
+        messageCache.invalidateAll()
         if (!folder.exists()) { folder.mkdirs() }
         if (!configFile.exists()) { configFile.createNewFile(); configFile.writeText(defaultConfig) }
         config = ConfigFactory.parseFile(configFile)
@@ -120,10 +123,10 @@ object ObjectConfig {
 
     private fun loadServerList() {
         val serverList = config!!.getConfigList("servers").map { serverConfig ->
-            val name = serverConfig.getString("server-name")
+            val name = serverConfig.getString("server-name").lowercase()
             val protocol = serverConfig.getIntList("protocol") ?: listOf(0)
             val warn = serverConfig.getBoolean("warn")
-            val warnMessage = messageCache.getIfPresent(serverConfig.getString("message"))
+            val warnMessage = messageCache.getIfPresent(serverConfig.getAnyRef("message").toString())
             WarnServer(name, protocol, warn, warnMessage)
         }
         serverList.forEach { serverCache.put(it.name, it) }
@@ -131,7 +134,7 @@ object ObjectConfig {
 
     private fun loadMessage() {
         val messageList = config!!.getConfigList("messages").map { messageConfig ->
-            val name = messageConfig.getString("name")
+            val name = messageConfig.getAnyRef("name").toString()
             val message = messageConfig.getStringList("message")
             val actionbar = messageConfig.getString("actionbar")
             val title = messageConfig.getString("title.title")

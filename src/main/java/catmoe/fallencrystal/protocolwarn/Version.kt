@@ -4,11 +4,11 @@ import catmoe.fallencrystal.protocolwarn.config.ObjectConfig
 
 object Version {
     fun replaceMessage(original: String, serverVersion: Int, clientVersion: Int): String {
-        return original.replace("[ServerVersion]", protocolFromConfig(serverVersion)).replace("[ClientVersion]", protocolToName(clientVersion))
+        return original.replace("[ServerVersion]", protocolFromConfig(serverVersion)).replace("[ClientVersion]", protocolFromConfig(clientVersion))
     }
 
-    @Deprecated("Protocol now can custom in config.")
-    fun protocolToName(version: Int): String {
+    @Deprecated("Protocol now can custom in config.", ReplaceWith("Protocol now can custom in config."))
+    private fun protocolToName(version: Int): String {
         return when (version) {
             762 -> { "1.19.4" }
             761 -> { "1.19.3" }
@@ -50,5 +50,5 @@ object Version {
         }
     }
 
-    fun protocolFromConfig(version: Int): String { return try { ObjectConfig.getConfig().getString("protocol.$version") } catch (ex: Exception) { "Unknown ($version)" } }
+    private fun protocolFromConfig(version: Int): String { return try { ObjectConfig.getConfig().getString("protocol.$version") } catch (ex: Exception) { "Unknown ($version)" } }
 }
