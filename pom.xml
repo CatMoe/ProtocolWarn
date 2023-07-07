@@ -151,9 +151,8 @@
         <dependency>
             <groupId>catmoe.fallencrystal</groupId>
             <artifactId>MoeFilter</artifactId>
-            <version>0.0.1-API4</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/MoeFilter.jar</systemPath>
+            <version>3.0.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>dev.simplix</groupId>
