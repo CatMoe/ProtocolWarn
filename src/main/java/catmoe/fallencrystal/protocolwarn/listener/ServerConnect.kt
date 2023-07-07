@@ -4,8 +4,9 @@ import catmoe.fallencrystal.moefilter.api.event.EventListener
 import catmoe.fallencrystal.moefilter.api.event.FilterEvent
 import catmoe.fallencrystal.moefilter.api.event.events.PluginReloadEvent
 import catmoe.fallencrystal.moefilter.api.event.events.bungee.AsyncServerConnectEvent
-import catmoe.fallencrystal.moefilter.util.message.MessageUtil
-import catmoe.fallencrystal.moefilter.util.message.MessageUtil.colorizeMiniMessage
+import catmoe.fallencrystal.moefilter.network.bungee.util.bconnection.ConnectionUtil
+import catmoe.fallencrystal.moefilter.util.message.v2.packet.type.MessagesType
+import catmoe.fallencrystal.moefilter.util.message.v2.MessageUtil
 import catmoe.fallencrystal.protocolwarn.Version
 import catmoe.fallencrystal.protocolwarn.config.Message
 import catmoe.fallencrystal.protocolwarn.config.ObjectConfig
@@ -31,20 +32,33 @@ class ServerConnect : EventListener {
     fun onReload(event: PluginReloadEvent) { ObjectConfig.loadConfig() }
 
     private fun sendMessage(message: Message, player: ProxiedPlayer, s: Int, c: Int) {
+        val connection = ConnectionUtil(player)
         if (player.hasPermission("protocolwarn.ignore.message.${message.name}")) { return }
         if (message.title.isNotEmpty() || message.subtitle.isNotEmpty() && message.titleStay != 0) {
-            MessageUtil.sendTitle(player, colorizeMiniMessage(rm(s,c,message.title)), colorizeMiniMessage(rm(s,c,message.subtitle)), message.titleFadeIn, message.titleStay, message.titleFadeOut)
+            // sendTitle(player, colorizeMiniMessage(rm(s,c,message.title)), colorizeMiniMessage(rm(s,c,message.subtitle)), message.titleFadeIn, message.titleStay, message.titleFadeOut)
+            title(player, message.title, message.subtitle, message.titleFadeIn, message.titleStay, message.titleFadeOut, c, s)
         }
-        if (message.actionbar.isNotEmpty()) { MessageUtil.sendActionbar(player, rm(s,c,message.actionbar)) }
+        // if (message.actionbar.isNotEmpty()) { MessageUtil.sendActionbar(player, rm(s,c,message.actionbar)) }
+        if (message.actionbar.isNotEmpty()) { MessageUtil.sendMessage(connection, MessagesType.ACTIONBAR, rm(s,c,message.actionbar)) }
         if (message.sound != null) { Sound.playSound(player, message.sound) }
         // message.message.forEach { MessageUtil.sendMessage(player, rm(s,c,it)) } -- Legacy
         if (message.message.isNotEmpty()) {
             val input = mutableListOf<String>()
             message.message.forEach { input.add(rm(s,c,it)) }
             // <reset> and <newline> are MiniMessage tag.
-            MessageUtil.sendMessage(player, colorizeMiniMessage(input.joinToString("<reset><newline>")))
+            MessageUtil.sendMessage(connection, MessagesType.CHAT, input.joinToString("<reset><newline>")
         }
     }
+    
+    @Suppress("deprecation)
+    private fun title(player: ProxiedPlayer, title: String, subtitle: String, fadeIn: Int, stay: Int, fadeOut: Int, client: Int, server: Int) {
+        val colorizeTitle = colorize(rm(server, client, title))
+        val colorizeSubtitle = colorize(rm(server, client, subtitle)
+        catmoe.fallencrystal.moefilter.util.message.MessageUtil.sendTitle(player, colorizeTitle, colorizeSubtitle, fadeIn, stay, fadeOut)
+    }
+    
+    @Suppress("deprecation)
+    private fun colorize(str: String): BaseComponent { return catmoe.fallencrystal.moefilter.util.message.MessageUtil.colorizeMiniMessage(str) }
 
     private fun rm(s: Int, c: Int, m: String): String { return Version.replaceMessage(m, s, c) }
 }
