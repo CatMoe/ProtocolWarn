@@ -1,6 +1,6 @@
 package catmoe.fallencrystal.protocolwarn.config
 
-import catmoe.fallencrystal.moefilter.util.message.MessageUtil
+import catmoe.fallencrystal.moefilter.util.message.v2.MessageUtil
 import catmoe.fallencrystal.protocolwarn.ObjectPlugin
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.typesafe.config.Config
@@ -28,20 +28,27 @@ object ObjectConfig {
                         server-name="example"
                         protocol=[47]
                         warn=true
-                        message="default"
+                        message=default
                     }
                     {
                         server-name="example2"
                         protocol=[762, 761]
                         # 是否向玩家发送警告消息. 如果为true则发送
                         warn=false
-                        message="default"
+                        message=default
+                    }
+                    {
+                        server-name="example3"
+                        # 无论如何都发送消息
+                        protocol=[]
+                        warn=true
+                        message=default
                     }
                     {
                         server-name="PT"
                         protocol=[47]
                         warn=true
-                        message="default"
+                        message=default
                     }
                 ]
                 messages=[
@@ -124,7 +131,7 @@ object ObjectConfig {
     private fun loadServerList() {
         val serverList = config!!.getConfigList("servers").map { serverConfig ->
             val name = serverConfig.getString("server-name").lowercase()
-            val protocol = serverConfig.getIntList("protocol") ?: listOf(0)
+            val protocol = if ((serverConfig.getIntList("protocol") ?: listOf(0)).isEmpty()) { listOf(0) } else { serverConfig.getIntList("protocol") ?: listOf(0) }
             val warn = serverConfig.getBoolean("warn")
             val warnMessage = messageCache.getIfPresent(serverConfig.getAnyRef("message").toString())
             WarnServer(name, protocol, warn, warnMessage)
@@ -151,8 +158,6 @@ object ObjectConfig {
     }
 
     fun getServer(server: String): WarnServer? { return serverCache.getIfPresent(server) }
-
-    fun getMessage(message: String): Message? { return messageCache.getIfPresent(message) }
 
     fun getConfig(): Config { return config!! }
 }
