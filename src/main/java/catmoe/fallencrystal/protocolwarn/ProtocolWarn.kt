@@ -8,12 +8,17 @@ import net.md_5.bungee.api.plugin.Plugin
 @Suppress("unused")
 class ProtocolWarn : Plugin() {
 
+    init { instance=this }
+
     override fun onEnable() {
-        ObjectPlugin.setPlugin(this)
-        ObjectPlugin.setDataFolder(dataFolder)
         ObjectConfig.loadConfig()
         EventManager.register(ServerConnect())
     }
 
     override fun onDisable() { EventManager.unregister(ServerConnect()) }
+
+    companion object {
+        lateinit var instance: ProtocolWarn
+            private set
+    }
 }

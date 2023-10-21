@@ -151,7 +151,7 @@
         <dependency>
             <groupId>catmoe.fallencrystal.moefilter</groupId>
             <artifactId>MoeFilter-Bungee</artifactId>
-            <version>0.1.2</version>
+            <version>0.1.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -164,12 +164,13 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
             <version>${kotlin.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>
             <version>${kotlin.version}</version>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

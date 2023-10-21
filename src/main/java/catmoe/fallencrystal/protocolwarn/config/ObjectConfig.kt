@@ -1,16 +1,15 @@
 package catmoe.fallencrystal.protocolwarn.config
 
 import catmoe.fallencrystal.moefilter.util.message.v2.MessageUtil
-import catmoe.fallencrystal.protocolwarn.ObjectPlugin
+import catmoe.fallencrystal.protocolwarn.ProtocolWarn
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import dev.simplix.protocolize.data.Sound
 import java.io.File
-import java.lang.IllegalArgumentException
 
 object ObjectConfig {
-    private val folder = ObjectPlugin.getDataFolder()
+    private val folder = ProtocolWarn.instance.dataFolder
     private val path = folder.absolutePath
     private val configFile = File(path, "config.conf")
 
@@ -113,6 +112,8 @@ object ObjectConfig {
                     108="1.9.1"
                     107="1.9"
                     47="1.8.x"
+                    5="1.7.x"
+                    4="1.7.x"
                 }
     """.trimIndent()
 
